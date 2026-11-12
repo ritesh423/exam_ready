@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -129,7 +129,7 @@ export default function AddExamScreen() {
       setNotes("");
       setReminderEnabled(false);
 
-      Alert.alert("Exam saved", "Your exam is saved on this device.");
+      router.replace("/");
     } catch {
       setFormError("Could not save the exam. Please try again.");
     } finally {
@@ -308,11 +308,11 @@ export default function AddExamScreen() {
                 </View>
                 <View style={styles.noticeCopy}>
                   <Text style={styles.noticeTitle}>
-                    A starter checklist will be added
+                    Check your official instructions
                   </Text>
                   <Text style={styles.noticeBody}>
-                    You can edit it after creating the exam and verify it
-                    against your official instructions.
+                    Use Notes for any items or entry rules specific to this
+                    exam.
                   </Text>
                 </View>
               </View>
