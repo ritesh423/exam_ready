@@ -1,6 +1,4 @@
-import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import {
   PlusJakartaSans_400Regular,
   PlusJakartaSans_600SemiBold,
@@ -10,10 +8,12 @@ import {
 import { Caveat_700Bold } from "@expo-google-fonts/caveat";
 import { Tabs } from "expo-router";
 import { StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { theme } from "../theme";
 
 export default function Layout() {
+  const insets = useSafeAreaInsets();
   const [fontsLoaded, fontError] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_600SemiBold,
@@ -29,9 +29,18 @@ export default function Layout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.primary,
-        tabBarInactiveTintColor: theme.textMuted,
-        tabBarStyle: styles.tabBar,
+        tabBarActiveTintColor: theme.notebook.accent,
+        tabBarInactiveTintColor: theme.notebook.muted,
+        tabBarLabelPosition: "below-icon",
+        tabBarHideOnKeyboard: true,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            height: theme.layout.tabBarHeight + insets.bottom,
+            paddingBottom: insets.bottom + 2,
+          },
+        ],
+        tabBarIconStyle: styles.tabIcon,
         tabBarLabelStyle: styles.tabLabel,
       }}
     >
@@ -39,11 +48,11 @@ export default function Layout() {
         name="index"
         options={{
           title: "Exams",
-          tabBarIcon: ({ size, color }) => (
-            <Entypo
-              name="calendar"
-              size={size}
-              color={typeof color === "string" ? color : theme.textMuted}
+          tabBarIcon: ({ focused }) => (
+            <NotebookTabIcon
+              name={focused ? "book" : "book-outline"}
+              focused={focused}
+              paperColor={theme.notebook.sage}
             />
           ),
         }}
@@ -51,12 +60,14 @@ export default function Layout() {
       <Tabs.Screen
         name="addExam"
         options={{
-          title: "Add Exam",
-          tabBarLabel: () => null,
-          tabBarIcon: () => (
-            <View style={styles.addButton}>
-              <Ionicons name="add" size={28} color={theme.white} />
-            </View>
+          title: "New exam",
+          tabBarIcon: ({ focused }) => (
+            <NotebookTabIcon
+              name={focused ? "add-circle" : "add-circle-outline"}
+              focused={focused}
+              paperColor={theme.notebook.peach}
+              alwaysHighlighted
+            />
           ),
         }}
       />
@@ -64,11 +75,11 @@ export default function Layout() {
         name="examDay"
         options={{
           title: "Exam Day",
-          tabBarIcon: ({ size, color }) => (
-            <MaterialIcons
-              name="event-available"
-              size={size}
-              color={typeof color === "string" ? color : theme.textMuted}
+          tabBarIcon: ({ focused }) => (
+            <NotebookTabIcon
+              name={focused ? "calendar" : "calendar-outline"}
+              focused={focused}
+              paperColor={theme.notebook.lavender}
             />
           ),
         }}
@@ -77,37 +88,62 @@ export default function Layout() {
   );
 }
 
+function NotebookTabIcon({
+  name,
+  focused,
+  paperColor,
+  alwaysHighlighted = false,
+}: {
+  name: React.ComponentProps<typeof Ionicons>["name"];
+  focused: boolean;
+  paperColor: string;
+  alwaysHighlighted?: boolean;
+}) {
+  const highlighted = focused || alwaysHighlighted;
+
+  return (
+    <View
+      style={[
+        styles.iconSticker,
+        highlighted && { backgroundColor: paperColor },
+      ]}
+    >
+      <Ionicons
+        name={name}
+        size={20}
+        color={highlighted ? theme.notebook.ink : theme.notebook.muted}
+      />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   tabBar: {
-    height: theme.layout.tabBarHeight,
-    paddingTop: 6,
-    paddingBottom: 6,
-    borderTopWidth: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.96)",
-    shadowColor: theme.text,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 12,
+    paddingTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: theme.notebook.line,
+    backgroundColor: theme.notebook.paper,
+    shadowColor: theme.notebook.ink,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  tabIcon: {
+    width: 40,
+    height: 30,
   },
   tabLabel: {
     fontFamily: theme.fontFamily.semiBold,
-    fontSize: 11,
-    lineHeight: 14,
-    letterSpacing: 0.44,
+    fontSize: 10,
+    lineHeight: 13,
+    letterSpacing: 0.2,
   },
-  addButton: {
-    width: 56,
-    height: 56,
-    marginTop: -24,
+  iconSticker: {
+    width: 40,
+    height: 30,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 28,
-    backgroundColor: theme.primary,
-    shadowColor: theme.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 8,
+    borderRadius: 10,
   },
 });
