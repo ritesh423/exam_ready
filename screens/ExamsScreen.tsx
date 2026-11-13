@@ -9,6 +9,7 @@ import {
   SectionList,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -103,7 +104,11 @@ export default function ExamsScreen() {
         stickySectionHeadersEnabled={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
-        ListHeaderComponent={<PageHeader />}
+        ListHeaderComponent={
+          <PageHeader
+            showIllustration={!loading && !error && exams.length > 0}
+          />
+        }
         ListEmptyComponent={
           loading ? (
             <ActivityIndicator
@@ -162,7 +167,10 @@ function NotebookRules() {
   );
 }
 
-function PageHeader() {
+function PageHeader({ showIllustration }: { showIllustration: boolean }) {
+  const { width } = useWindowDimensions();
+  const illustrationWidth = Math.min(150, width * 0.36);
+
   return (
     <View style={styles.header}>
       <View style={styles.brandRow}>
@@ -172,8 +180,34 @@ function PageHeader() {
         <Text style={styles.brandText}>examready</Text>
         <Text style={styles.pageLabel}>YOUR PLANNER</Text>
       </View>
-      <Text style={styles.heading}>Your exams</Text>
-      <Text style={styles.subtitle}>A little order for the big day.</Text>
+      <View style={styles.headerIntro}>
+        <View style={styles.headerCopy}>
+          <Text
+            style={[
+              styles.heading,
+              showIllustration && styles.illustratedHeading,
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
+            Your exams
+          </Text>
+          <Text style={styles.subtitle}>A little order for the big day.</Text>
+        </View>
+        {showIllustration && (
+          <Image
+            source={require("../assets/exams-home-watercolor-corner.png")}
+            style={{
+              width: illustrationWidth,
+              height: illustrationWidth * 0.8,
+            }}
+            resizeMode="contain"
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+        )}
+      </View>
     </View>
   );
 }
@@ -360,10 +394,18 @@ const styles = StyleSheet.create({
   ruleLine: {
     height: 31,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(89, 88, 168, 0.04)",
+    borderBottomColor: "rgba(89, 88, 168, 0.05)",
   },
   content: { paddingHorizontal: theme.layout.screenPadding, paddingBottom: 40 },
   header: { paddingTop: 12, paddingBottom: 23 },
+  headerIntro: {
+    minHeight: 98,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerCopy: { flex: 1 },
+  illustratedHeading: { marginTop: 0 },
   brandRow: {
     minHeight: 44,
     flexDirection: "row",

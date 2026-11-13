@@ -7,6 +7,7 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -82,10 +83,11 @@ export default function ExamPlanScreen() {
     setBusy(true);
     setError(null);
     let newFileName: string | null = null;
+    let stage: "picker" | "copy" | "database" = "picker";
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: "application/pdf",
-        copyToCacheDirectory: true,
+        copyToCacheDirectory: Platform.OS !== "android",
         multiple: false,
       });
       if (result.canceled) return;
@@ -99,7 +101,9 @@ export default function ExamPlanScreen() {
         return;
       }
 
+      stage = "copy";
       newFileName = await copyAdmitCard(exam.id, picked.uri);
+      stage = "database";
       await setAdmitCard(exam.id, newFileName, picked.name);
       const oldFileName = exam.admitCardUri;
       setExam({
@@ -114,13 +118,24 @@ export default function ExamPlanScreen() {
           // The replacement is saved; a stale old file can be cleaned up later.
         }
       }
-    } catch {
+    } catch (cause) {
+      console.error(`Admit card ${stage} failed`, cause);
       if (newFileName) {
         try {
           deleteAdmitCard(newFileName);
         } catch {}
       }
-      setError("Couldn’t attach the PDF. Please try again.");
+      const message =
+        stage === "picker"
+          ? "Couldn’t read the selected PDF. Try downloading it to your device first."
+          : stage === "copy"
+            ? "Couldn’t save a copy of this PDF on your device."
+            : "Couldn’t link the PDF to this exam. Please try again.";
+      setError(
+        __DEV__ && cause instanceof Error
+          ? `${message} ${cause.message.slice(0, 160)}`
+          : message,
+      );
     } finally {
       setBusy(false);
     }
