@@ -28,7 +28,13 @@
       "@react-native-community/datetimepicker",
       "expo-font",
       "expo-sqlite",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-notifications",
+        {
+          "enableRemoteNotifications": false
+        }
+      ]
     ]
   }
 }

@@ -30,3 +30,7 @@ npx expo start
 ```
 
 Open the project in Expo Go or an Android emulator.
+
+## Artwork
+
+The Exams screen uses the [Exams illustration by Storyset](https://storyset.com/illustration/exams/bro).

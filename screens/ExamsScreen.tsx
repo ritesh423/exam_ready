@@ -152,6 +152,13 @@ export default function ExamsScreen() {
         )}
         ItemSeparatorComponent={() => <View style={styles.itemGap} />}
         renderSectionFooter={() => <View style={styles.sectionGap} />}
+        ListFooterComponent={
+          !loading && !error ? (
+            <Text style={styles.illustrationCredit}>
+              Illustration by Storyset
+            </Text>
+          ) : undefined
+        }
       />
     </SafeAreaView>
   );
@@ -169,7 +176,7 @@ function NotebookRules() {
 
 function PageHeader({ showIllustration }: { showIllustration: boolean }) {
   const { width } = useWindowDimensions();
-  const illustrationWidth = Math.min(150, width * 0.36);
+  const illustrationWidth = Math.min(170, width * 0.43);
 
   return (
     <View style={styles.header}>
@@ -197,10 +204,10 @@ function PageHeader({ showIllustration }: { showIllustration: boolean }) {
         </View>
         {showIllustration && (
           <Image
-            source={require("../assets/exams-home-watercolor-corner.png")}
+            source={require("../assets/exams-home-storyset.png")}
             style={{
               width: illustrationWidth,
-              height: illustrationWidth * 0.8,
+              height: illustrationWidth,
             }}
             resizeMode="contain"
             accessibilityElementsHidden
@@ -216,10 +223,10 @@ function EmptyPlanner() {
   return (
     <View style={styles.emptyCard}>
       <Image
-        source={require("../assets/add-exam-notebook-hero.png")}
+        source={require("../assets/exams-home-storyset.png")}
         style={styles.emptyIllustration}
         resizeMode="contain"
-        accessibilityLabel="Illustrated checklist, calendar and exam ticket"
+        accessibilityLabel="Student working through exam papers"
       />
       <Text style={styles.emptyHeading}>A fresh page.</Text>
       <Text style={styles.emptyText}>
@@ -634,7 +641,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.notebook.paper,
   },
-  emptyIllustration: { width: 138, height: 138 },
+  emptyIllustration: { width: 190, height: 190 },
   emptyHeading: {
     marginTop: 8,
     color: theme.notebook.ink,
@@ -697,5 +704,11 @@ const styles = StyleSheet.create({
     color: theme.notebook.accent,
     fontFamily: theme.fontFamily.bold,
     fontSize: 12,
+  },
+  illustrationCredit: {
+    color: theme.notebook.muted,
+    fontFamily: theme.fontFamily.regular,
+    fontSize: 10,
+    textAlign: "center",
   },
 });

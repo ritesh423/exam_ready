@@ -27,6 +27,13 @@ import { theme } from "../theme";
 import { useState } from "react";
 
 import { saveExam } from "../data/exams";
+import {
+  cancelReminder,
+  eveningBeforeReminderTime,
+  ReminderPermissionError,
+  ReminderTimePassedError,
+  scheduleEveningBeforeReminder,
+} from "../data/reminders";
 
 const twoDigits = (number: number) => String(number).padStart(2, "0");
 
@@ -106,9 +113,27 @@ export default function AddExamScreen() {
   const handleCreateExam = async () => {
     if (isSaving || !validateExam() || !examDate || !reportingTime) return;
 
+    if (
+      reminderEnabled &&
+      eveningBeforeReminderTime(examDate).getTime() <= Date.now()
+    ) {
+      setFormError(
+        "The evening-before reminder time has passed. Choose a later exam date or turn the reminder off.",
+      );
+      return;
+    }
+
     setIsSaving(true);
+    let notificationId: string | null = null;
 
     try {
+      if (reminderEnabled) {
+        notificationId = await scheduleEveningBeforeReminder(
+          examName.trim(),
+          examDate,
+        );
+      }
+
       await saveExam({
         name: examName.trim(),
         examDate: formatDate(examDate),
@@ -117,7 +142,7 @@ export default function AddExamScreen() {
         centerName: centerName.trim(),
         centerAddress: centerAddress.trim(),
         notes: notes.trim(),
-        reminderEnabled,
+        reminderNotificationId: notificationId,
       });
 
       setExamName("");
@@ -130,8 +155,23 @@ export default function AddExamScreen() {
       setReminderEnabled(false);
 
       router.replace("/");
-    } catch {
-      setFormError("Could not save the exam. Please try again.");
+    } catch (error) {
+      if (notificationId) {
+        try {
+          await cancelReminder(notificationId);
+        } catch (cancelError) {
+          console.error("Could not cancel unsaved exam reminder", cancelError);
+        }
+      }
+      setFormError(
+        error instanceof ReminderPermissionError
+          ? "Allow notifications in your device settings, or turn off the reminder to save this exam."
+          : error instanceof ReminderTimePassedError
+            ? "The evening-before reminder time has passed. Choose a later exam date or turn the reminder off."
+            : reminderEnabled && !notificationId
+              ? "Could not schedule the reminder. Try again or turn it off to save this exam."
+              : "Could not save the exam. Please try again.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -270,7 +310,7 @@ export default function AddExamScreen() {
                     Remind me the evening before
                   </Text>
                   <Text style={styles.fieldHelperText}>
-                    Receive a preparation reminder at 7:00 PM.
+                    Receive a preparation reminder around 7:00 PM.
                   </Text>
                 </View>
                 <Switch

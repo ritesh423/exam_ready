@@ -8,7 +8,7 @@ export type NewExam = {
   centerName: string;
   centerAddress: string;
   notes: string;
-  reminderEnabled: boolean;
+  reminderNotificationId: string | null;
 };
 
 export type ExamSummary = {
@@ -48,6 +48,7 @@ function getDatabase() {
           center_address TEXT NOT NULL,
           notes TEXT NOT NULL,
           reminder_enabled INTEGER NOT NULL DEFAULT 0,
+          reminder_notification_id TEXT,
           admit_card_uri TEXT,
           admit_card_name TEXT,
           created_at TEXT NOT NULL
@@ -59,6 +60,14 @@ function getDatabase() {
       );
       if (!columns.some((column) => column.name === "admit_card_name")) {
         await db.execAsync("ALTER TABLE exams ADD COLUMN admit_card_name TEXT");
+      }
+      if (
+        !columns.some((column) => column.name === "reminder_notification_id")
+      ) {
+        await db.execAsync(
+          "ALTER TABLE exams ADD COLUMN reminder_notification_id TEXT",
+        );
+        await db.execAsync("UPDATE exams SET reminder_enabled = 0");
       }
 
       return db;
@@ -77,8 +86,9 @@ export async function saveExam(exam: NewExam): Promise<number> {
   const result = await db.runAsync(
     `INSERT INTO exams (
       name, exam_date, reporting_time, leave_by_time,
-      center_name, center_address, notes, reminder_enabled, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      center_name, center_address, notes, reminder_enabled,
+      reminder_notification_id, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       exam.name,
       exam.examDate,
@@ -87,7 +97,8 @@ export async function saveExam(exam: NewExam): Promise<number> {
       exam.centerName,
       exam.centerAddress,
       exam.notes,
-      exam.reminderEnabled ? 1 : 0,
+      exam.reminderNotificationId ? 1 : 0,
+      exam.reminderNotificationId,
       new Date().toISOString(),
     ],
   );
