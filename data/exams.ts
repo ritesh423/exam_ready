@@ -35,7 +35,7 @@ let databasePromise: Promise<SQLite.SQLiteDatabase> | null = null;
 function getDatabase() {
   if (!databasePromise) {
     databasePromise = (async () => {
-      const db = await SQLite.openDatabaseAsync("examready.db");
+      const db = await SQLite.openDatabaseAsync("examinute.db");
 
       await db.execAsync(`
         CREATE TABLE IF NOT EXISTS exams (

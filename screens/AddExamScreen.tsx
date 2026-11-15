@@ -156,6 +156,7 @@ export default function AddExamScreen() {
 
       router.replace("/");
     } catch (error) {
+      console.warn("Exam creation failed", error);
       if (notificationId) {
         try {
           await cancelReminder(notificationId);
@@ -260,7 +261,7 @@ export default function AddExamScreen() {
                   color={theme.notebook.accent}
                 />
                 <Text style={styles.peachHelperText}>
-                  Enter the time you plan to leave. ExamReady does not calculate
+                  Enter the time you plan to leave. Examinute does not calculate
                   travel time automatically.
                 </Text>
               </View>
@@ -310,7 +311,7 @@ export default function AddExamScreen() {
                     Remind me the evening before
                   </Text>
                   <Text style={styles.fieldHelperText}>
-                    Receive a preparation reminder around 7:00 PM.
+                    Get a reminder at 7:00 PM.
                   </Text>
                 </View>
                 <Switch
@@ -450,7 +451,7 @@ function NotebookHeader() {
         <View style={styles.brandMark}>
           <Ionicons name="book-outline" size={17} color={theme.notebook.ink} />
         </View>
-        <Text style={styles.brandText}>examready</Text>
+        <Text style={styles.brandText}>examinute</Text>
       </View>
       <View style={styles.pageLabel}>
         <Text style={styles.pageLabelText}>NEW EXAM / 01</Text>

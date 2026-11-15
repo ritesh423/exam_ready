@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { AndroidImportance, IosAuthorizationStatus } from "expo-notifications";
 import { Platform } from "react-native";
@@ -40,11 +41,18 @@ export async function scheduleEveningBeforeReminder(
   const date = eveningBeforeReminderTime(examDate);
   if (date.getTime() <= Date.now()) throw new ReminderTimePassedError();
 
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync(REMINDER_CHANNEL, {
-      name: "Exam reminders",
-      importance: AndroidImportance.HIGH,
-    });
+  let channelId: string | undefined;
+  if (Platform.OS === "android" && !Constants.expoGoConfig) {
+    try {
+      await Notifications.setNotificationChannelAsync(REMINDER_CHANNEL, {
+        name: "Exam reminders",
+        importance: AndroidImportance.HIGH,
+      });
+      channelId = REMINDER_CHANNEL;
+    } catch (error) {
+      // Expo's fallback channel can still deliver the notification.
+      console.warn("Could not create the exam reminder channel", error);
+    }
   }
 
   let permission = await Notifications.getPermissionsAsync();
@@ -63,7 +71,7 @@ export async function scheduleEveningBeforeReminder(
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DATE,
       date,
-      ...(Platform.OS === "android" ? { channelId: REMINDER_CHANNEL } : {}),
+      ...(channelId ? { channelId } : {}),
     },
   });
 }

@@ -1,4 +1,4 @@
-# ExamReady
+# Examinute
 
 A notebook-style exam planner built with Expo and React Native. Keep exam dates, reporting and leave-by times, centre details, notes, and an admit-card PDF together.
 
@@ -30,7 +30,3 @@ npx expo start
 ```
 
 Open the project in Expo Go or an Android emulator.
-
-## Artwork
-
-The Exams screen uses the [Exams illustration by Storyset](https://storyset.com/illustration/exams/bro).

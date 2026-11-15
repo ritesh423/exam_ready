@@ -222,7 +222,7 @@ export default function ExamPlanScreen() {
         >
           <Ionicons name="arrow-back" size={20} color={theme.notebook.ink} />
         </Pressable>
-        <Text style={styles.brand}>examready</Text>
+        <Text style={styles.brand}>examinute</Text>
         <Text style={styles.topLabel}>EXAM PLAN</Text>
       </View>
 

@@ -216,7 +216,7 @@ function PageHeader({ isToday }: { isToday: boolean }) {
         <View style={styles.brandMark}>
           <Ionicons name="book-outline" size={17} color={theme.notebook.ink} />
         </View>
-        <Text style={styles.brandText}>examready</Text>
+        <Text style={styles.brandText}>examinute</Text>
         <Text style={styles.pageLabel}>DAY-OF DESK</Text>
       </View>
       <Text style={styles.heading}>Exam day</Text>
@@ -716,7 +716,9 @@ const styles = StyleSheet.create({
   primaryButton: {
     marginTop: 18,
     minHeight: 48,
+    alignSelf: "stretch",
     borderRadius: 14,
+    paddingHorizontal: 18,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

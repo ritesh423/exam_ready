@@ -93,11 +93,12 @@ export default function ExamsScreen() {
     ...(upcoming.length ? [{ title: "Coming up", data: upcoming }] : []),
     ...(earlier.length ? [{ title: "Earlier dates", data: earlier }] : []),
   ];
+  const showHeaderIllustration = !loading && !error && exams.length > 0;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <StatusBar style="dark" />
-      <NotebookRules />
+      <NotebookRules showPaperClip={!showHeaderIllustration} />
       <SectionList
         sections={sections}
         keyExtractor={(item) => String(item.id)}
@@ -105,9 +106,7 @@ export default function ExamsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
         ListHeaderComponent={
-          <PageHeader
-            showIllustration={!loading && !error && exams.length > 0}
-          />
+          <PageHeader showIllustration={showHeaderIllustration} />
         }
         ListEmptyComponent={
           loading ? (
@@ -152,31 +151,37 @@ export default function ExamsScreen() {
         )}
         ItemSeparatorComponent={() => <View style={styles.itemGap} />}
         renderSectionFooter={() => <View style={styles.sectionGap} />}
-        ListFooterComponent={
-          !loading && !error ? (
-            <Text style={styles.illustrationCredit}>
-              Illustration by Storyset
-            </Text>
-          ) : undefined
-        }
       />
     </SafeAreaView>
   );
 }
 
-function NotebookRules() {
+function NotebookRules({ showPaperClip }: { showPaperClip: boolean }) {
   return (
     <View pointerEvents="none" style={styles.rules}>
       {Array.from({ length: 36 }, (_, index) => (
         <View key={index} style={styles.ruleLine} />
       ))}
+      <View style={styles.pageMargin} />
+      <View style={styles.punchMarks}>
+        {Array.from({ length: 4 }, (_, index) => (
+          <View key={index} style={styles.punchRing}>
+            <View style={styles.punchHole} />
+          </View>
+        ))}
+      </View>
+      {showPaperClip && (
+        <View style={styles.paperClip}>
+          <View style={styles.paperClipInner} />
+        </View>
+      )}
     </View>
   );
 }
 
 function PageHeader({ showIllustration }: { showIllustration: boolean }) {
   const { width } = useWindowDimensions();
-  const illustrationWidth = Math.min(170, width * 0.43);
+  const illustrationWidth = Math.min(140, width * 0.35);
 
   return (
     <View style={styles.header}>
@@ -184,7 +189,7 @@ function PageHeader({ showIllustration }: { showIllustration: boolean }) {
         <View style={styles.brandMark}>
           <Ionicons name="book-outline" size={17} color={theme.notebook.ink} />
         </View>
-        <Text style={styles.brandText}>examready</Text>
+        <Text style={styles.brandText}>examinute</Text>
         <Text style={styles.pageLabel}>YOUR PLANNER</Text>
       </View>
       <View style={styles.headerIntro}>
@@ -204,11 +209,8 @@ function PageHeader({ showIllustration }: { showIllustration: boolean }) {
         </View>
         {showIllustration && (
           <Image
-            source={require("../assets/exams-home-storyset.png")}
-            style={{
-              width: illustrationWidth,
-              height: illustrationWidth,
-            }}
+            source={require("../assets/examinute-home-illustration.png")}
+            style={{ width: illustrationWidth, height: illustrationWidth }}
             resizeMode="contain"
             accessibilityElementsHidden
             importantForAccessibility="no"
@@ -223,10 +225,10 @@ function EmptyPlanner() {
   return (
     <View style={styles.emptyCard}>
       <Image
-        source={require("../assets/exams-home-storyset.png")}
+        source={require("../assets/examinute-home-illustration.png")}
         style={styles.emptyIllustration}
         resizeMode="contain"
-        accessibilityLabel="Student working through exam papers"
+        accessibilityLabel="Student writing an exam with papers and a calendar"
       />
       <Text style={styles.emptyHeading}>A fresh page.</Text>
       <Text style={styles.emptyText}>
@@ -401,9 +403,64 @@ const styles = StyleSheet.create({
   ruleLine: {
     height: 31,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(89, 88, 168, 0.05)",
+    borderBottomColor: "rgba(89, 88, 168, 0.1)",
   },
-  content: { paddingHorizontal: theme.layout.screenPadding, paddingBottom: 40 },
+  pageMargin: {
+    position: "absolute",
+    top: 35,
+    bottom: 0,
+    left: 43,
+    width: 1,
+    backgroundColor: "rgba(217, 135, 121, 0.45)",
+  },
+  punchMarks: {
+    position: "absolute",
+    top: 165,
+    left: 7,
+    gap: 96,
+  },
+  punchRing: {
+    width: 21,
+    height: 21,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255, 252, 245, 0.55)",
+  },
+  punchHole: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: "#D8D1C5",
+    borderWidth: 1,
+    borderColor: "rgba(41, 41, 31, 0.12)",
+  },
+  paperClip: {
+    position: "absolute",
+    top: 105,
+    right: 28,
+    width: 40,
+    height: 65,
+    borderWidth: 4,
+    borderBottomWidth: 0,
+    borderColor: "rgba(89, 88, 168, 0.55)",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    transform: [{ rotate: "13deg" }],
+  },
+  paperClipInner: {
+    position: "absolute",
+    top: 12,
+    left: 9,
+    width: 15,
+    height: 43,
+    borderWidth: 3,
+    borderBottomWidth: 0,
+    borderColor: "rgba(89, 88, 168, 0.38)",
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  content: { paddingLeft: 27, paddingRight: 17, paddingBottom: 40 },
   header: { paddingTop: 12, paddingBottom: 23 },
   headerIntro: {
     minHeight: 98,
@@ -641,7 +698,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.notebook.paper,
   },
-  emptyIllustration: { width: 190, height: 190 },
+  emptyIllustration: { width: 150, height: 150 },
   emptyHeading: {
     marginTop: 8,
     color: theme.notebook.ink,
@@ -704,11 +761,5 @@ const styles = StyleSheet.create({
     color: theme.notebook.accent,
     fontFamily: theme.fontFamily.bold,
     fontSize: 12,
-  },
-  illustrationCredit: {
-    color: theme.notebook.muted,
-    fontFamily: theme.fontFamily.regular,
-    fontSize: 10,
-    textAlign: "center",
   },
 });

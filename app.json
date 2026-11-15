@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "exam_ready",
-    "scheme": "exam_ready",
-    "slug": "exam_ready",
+    "name": "Examinute",
+    "scheme": "examinute",
+    "slug": "examinute",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,8 +11,9 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.ritesh.examinute",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#041C33",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -33,6 +34,15 @@
         "expo-notifications",
         {
           "enableRemoteNotifications": false
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#041C33",
+          "image": "./assets/android-icon-foreground.png",
+          "imageWidth": 240,
+          "resizeMode": "contain"
         }
       ]
     ]

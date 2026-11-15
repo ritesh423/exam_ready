@@ -6,8 +6,13 @@ import {
   useFonts,
 } from "@expo-google-fonts/plus-jakarta-sans";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
 import "../data/reminders";
+
+SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({ duration: 400, fade: true });
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -16,6 +21,10 @@ export default function RootLayout() {
     PlusJakartaSans_700Bold,
     Caveat_700Bold,
   });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) SplashScreen.hide();
+  }, [fontsLoaded, fontError]);
 
   if (!fontsLoaded && !fontError) return null;
 
