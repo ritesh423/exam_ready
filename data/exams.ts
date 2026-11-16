@@ -28,6 +28,7 @@ export type ExamDayDetails = ExamSummary & {
 export type ExamPlan = ExamDayDetails & {
   admitCardUri: string | null;
   admitCardName: string | null;
+  reminderNotificationId: string | null;
 };
 
 let databasePromise: Promise<SQLite.SQLiteDatabase> | null = null;
@@ -157,11 +158,18 @@ export async function getExamPlan(id: number): Promise<ExamPlan | null> {
       center_address AS centerAddress,
       notes,
       admit_card_uri AS admitCardUri,
-      admit_card_name AS admitCardName
+      admit_card_name AS admitCardName,
+      reminder_notification_id AS reminderNotificationId
     FROM exams
     WHERE id = ?`,
     [id],
   );
+}
+
+export async function deleteExam(id: number): Promise<void> {
+  const db = await getDatabase();
+  const result = await db.runAsync("DELETE FROM exams WHERE id = ?", [id]);
+  if (result.changes !== 1) throw new Error("Exam not found");
 }
 
 export async function setAdmitCard(

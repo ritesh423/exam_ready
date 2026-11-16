@@ -21,7 +21,13 @@ import {
   deleteAdmitCard,
   getAdmitCardFile,
 } from "../data/admitCards";
-import { getExamPlan, setAdmitCard, type ExamPlan } from "../data/exams";
+import {
+  deleteExam,
+  getExamPlan,
+  setAdmitCard,
+  type ExamPlan,
+} from "../data/exams";
+import { cancelReminder } from "../data/reminders";
 import { theme } from "../theme";
 
 function formatDate(value: string) {
@@ -50,6 +56,7 @@ export default function ExamPlanScreen() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const loadExam = useCallback(() => {
     if (!validId) {
@@ -60,6 +67,7 @@ export default function ExamPlanScreen() {
     let active = true;
     setLoading(true);
     setError(null);
+    setDeleteError(null);
     setExam(null);
     void getExamPlan(examId)
       .then((result) => {
@@ -198,6 +206,46 @@ export default function ExamPlanScreen() {
                 }
               } catch {
                 setError("Couldn’t remove the PDF. Please try again.");
+              } finally {
+                setBusy(false);
+              }
+            })();
+          },
+        },
+      ],
+    );
+  };
+
+  const removeExam = () => {
+    if (!exam || busy) return;
+    Alert.alert(
+      "Delete this exam?",
+      `“${exam.name}” and its saved PDF will be permanently removed. Its reminder will be cancelled.`,
+      [
+        { text: "Keep exam", style: "cancel" },
+        {
+          text: "Delete exam",
+          style: "destructive",
+          onPress: () => {
+            void (async () => {
+              setBusy(true);
+              setDeleteError(null);
+              try {
+                if (exam.reminderNotificationId) {
+                  await cancelReminder(exam.reminderNotificationId);
+                }
+                await deleteExam(exam.id);
+                if (exam.admitCardUri) {
+                  try {
+                    deleteAdmitCard(exam.admitCardUri);
+                  } catch (cause) {
+                    console.warn("Couldn’t remove the saved admit card", cause);
+                  }
+                }
+                router.replace("/");
+              } catch (cause) {
+                console.error("Couldn’t delete the exam", cause);
+                setDeleteError("Couldn’t delete this exam. Please try again.");
               } finally {
                 setBusy(false);
               }
@@ -420,6 +468,27 @@ export default function ExamPlanScreen() {
               <Text style={styles.body}>{exam.notes}</Text>
             </View>
           ) : null}
+
+          {deleteError && (
+            <Text accessibilityRole="alert" style={styles.error}>
+              {deleteError}
+            </Text>
+          )}
+          <Pressable
+            onPress={removeExam}
+            disabled={busy}
+            accessibilityRole="button"
+            accessibilityHint="Permanently removes this exam and its saved PDF and reminder"
+            style={({ pressed }) => [
+              styles.deleteExamButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Ionicons name="trash-outline" size={18} color={theme.danger} />
+            <Text style={styles.deleteExamText}>
+              {busy ? "Working..." : "Delete exam"}
+            </Text>
+          </Pressable>
         </ScrollView>
       )}
     </SafeAreaView>
@@ -635,6 +704,23 @@ const styles = StyleSheet.create({
   removeText: {
     fontFamily: theme.fontFamily.semiBold,
     fontSize: 11,
+    color: theme.danger,
+  },
+  deleteExamButton: {
+    minHeight: 50,
+    marginTop: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#DDB6AF",
+    backgroundColor: theme.notebook.paper,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  deleteExamText: {
+    fontFamily: theme.fontFamily.semiBold,
+    fontSize: 12,
     color: theme.danger,
   },
   placeName: {
