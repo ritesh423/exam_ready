@@ -151,6 +151,23 @@ export default function ExamsScreen() {
         )}
         ItemSeparatorComponent={() => <View style={styles.itemGap} />}
         renderSectionFooter={() => <View style={styles.sectionGap} />}
+        ListFooterComponent={
+          <Pressable
+            onPress={() => router.push("/privacy")}
+            accessibilityRole="link"
+            style={({ pressed }) => [
+              styles.privacyLink,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.privacyLinkText}>Privacy policy</Text>
+            <Ionicons
+              name="arrow-forward"
+              size={14}
+              color={theme.notebook.accent}
+            />
+          </Pressable>
+        }
       />
     </SafeAreaView>
   );
@@ -461,6 +478,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 12,
   },
   content: { paddingLeft: 27, paddingRight: 17, paddingBottom: 40 },
+  privacyLink: {
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    marginTop: 8,
+  },
+  privacyLinkText: {
+    color: theme.notebook.accent,
+    fontFamily: theme.fontFamily.semiBold,
+    fontSize: 12,
+  },
   header: { paddingTop: 12, paddingBottom: 23 },
   headerIntro: {
     minHeight: 98,
