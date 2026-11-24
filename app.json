@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "com.ritesh.examinute",
+      "blockedPermissions": ["com.google.android.gms.permission.AD_ID"],
       "adaptiveIcon": {
         "backgroundColor": "#041C33",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -24,6 +25,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "./plugins/withOptionalPortraitFeature",
       "expo-router",
       "expo-status-bar",
       "@react-native-community/datetimepicker",
